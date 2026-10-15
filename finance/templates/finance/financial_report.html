@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Advisory Report - {{ business.business_name }}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; padding: 0 !important; }
+            .print-shadow-none { box-shadow: none !important; border-color: #cbd5e1 !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen selection:bg-brand-500 selection:text-white pb-16">
+
+    <!-- Top Navigation Bar (Hidden on print) -->
+    <nav class="no-print bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200/80 mb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/70 px-4 py-2 rounded-xl transition">
+                    &larr; Back to Dashboard
+                </a>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <a href="?refresh=1" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 transition" title="Re-run LangGraph Advisory Workflow">
+                    <span>&#x21bb;</span> Re-run AI Analysis
+                </a>
+                <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 transition">
+                    <span>🖨</span> Print / PDF
+                </button>
+                <a href="{% url 'create_financial_plan' business.id %}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-brand-700 hover:bg-brand-800 shadow-sm transition">
+                    + New Plan
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+
+        <!-- Enterprise Header Card -->
+        <div class="bg-gradient-to-r from-brand-900 via-brand-800 to-emerald-800 rounded-3xl p-6 sm:p-10 text-white shadow-xl shadow-brand-900/10 relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-emerald-200 text-xs font-bold uppercase tracking-wider">
+                        🌾 Hyper-Local Rural Advisory Report
+                    </span>
+                    <span class="text-xs text-emerald-200 font-medium">
+                        Generated on {{ plan.created_at|date:"d M Y, h:i A" }}
+                    </span>
+                </div>
+
+                <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">
+                    {{ business.business_name }}
+                </h1>
+
+                <div class="flex flex-wrap items-center gap-6 text-sm text-emerald-100 font-medium">
+                    <span class="flex items-center gap-1.5">
+                        <span class="text-white">🏷 Sector:</span> 
+                        <strong class="text-white">{{ business.get_business_type_display }}</strong>
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <span class="text-white">📍 Location:</span> 
+                        <strong class="text-white">{{ business.village }}, {{ business.district }}, {{ business.state }}</strong>
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <span class="text-white">💰 Available Capital:</span> 
+                        <strong class="text-white">₹{{ business.available_capital|floatformat:2 }}</strong>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Advisory Summary Verdict Banner -->
+        <div class="bg-blue-50/90 border-l-4 border-blue-600 rounded-2xl p-6 shadow-sm">
+            <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xl flex-shrink-0 shadow-sm shadow-blue-500/20">
+                    🤖
+                </div>
+                <div>
+                    <h2 class="text-base font-extrabold text-blue-900 mb-1">
+                        LangGraph Advisory Engine Verdict
+                    </h2>
+                    <p class="text-sm sm:text-base text-blue-800 leading-relaxed font-medium">
+                        {{ report.advisory_summary }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Node 1: Financial Analysis Grid -->
+        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                        <span class="text-brand-700">📊 Node 1:</span> Financial Viability & Calculators
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-500">Unit economics calculated using standard break-even and reducing-balance amortization.</p>
+                </div>
+                <span class="text-xs font-bold px-2.5 py-1 rounded bg-slate-100 text-slate-600">
+                    Python Tools
+                </span>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <!-- Revenue -->
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/70">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Monthly Revenue</div>
+                    <div class="text-xl font-extrabold text-slate-900">₹{{ plan.monthly_revenue|floatformat:0 }}</div>
+                    <div class="text-[11px] text-slate-500 mt-1">Expected sales</div>
+                </div>
+
+                <!-- Break-Even -->
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/70">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Break-Even Sales</div>
+                    <div class="text-xl font-extrabold text-slate-900">₹{{ break_even|floatformat:0 }}</div>
+                    <div class="text-[11px] text-slate-500 mt-1">Zero-profit target</div>
+                </div>
+
+                <!-- Profit -->
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/70">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Monthly Profit</div>
+                    <div class="text-xl font-extrabold {% if profit >= 0 %}text-emerald-600{% else %}text-red-600{% endif %}">
+                        ₹{{ profit|floatformat:0 }}
+                    </div>
+                    <div class="text-[11px] text-slate-500 mt-1">Net surplus</div>
+                </div>
+
+                <!-- Margin -->
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/70">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Profit Margin</div>
+                    <div class="text-xl font-extrabold text-slate-900">
+                        {% if profit_margin != None %}{{ profit_margin|floatformat:1 }}%{% else %}N/A{% endif %}
+                    </div>
+                    <div class="text-[11px] text-slate-500 mt-1">Net return ratio</div>
+                </div>
+
+                <!-- Loan EMI -->
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/70">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Monthly EMI</div>
+                    <div class="text-xl font-extrabold text-slate-900">
+                        {% if emi != None %}₹{{ emi|floatformat:0 }}{% else %}₹0{% endif %}
+                    </div>
+                    <div class="text-[11px] text-slate-500 mt-1">
+                        {% if plan.loan_amount > 0 %}₹{{ plan.loan_amount|floatformat:0 }} loan{% else %}Self-funded{% endif %}
+                    </div>
+                </div>
+
+                <!-- Repayment Health -->
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/70">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Debt Health</div>
+                    <div class="text-base font-extrabold text-slate-900 mt-0.5">
+                        {% if emi_ratio != None %}
+                            {{ emi_ratio|floatformat:1 }}%
+                        {% else %}
+                            Debt-Free
+                        {% endif %}
+                    </div>
+                    <div class="text-[11px] text-slate-500 mt-1 font-semibold">
+                        {{ report.financial_analysis.repayment_health|default:"Safe" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Node 4: Actionable Recommendations -->
+        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                        <span class="text-brand-700">💡 Node 4:</span> Actionable Recommendations for Rural Entrepreneurs
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-500">Prioritized advisory synthesized across your capital, pricing, and loan structure.</p>
+                </div>
+                <span class="text-xs font-bold px-2.5 py-1 rounded bg-brand-50 text-brand-800">
+                    Advisory Synthesis
+                </span>
+            </div>
+
+            <div class="space-y-3">
+                {% for rec in report.recommendations %}
+                <div class="flex items-start gap-3 p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200/70 text-emerald-950 text-sm font-medium">
+                    <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 shadow-sm">
+                        ✓
+                    </span>
+                    <span class="leading-relaxed">{{ rec }}</span>
+                </div>
+                {% empty %}
+                <div class="p-4 rounded-2xl bg-slate-50 text-slate-500 text-sm">
+                    Maintain strict cost control and regular accounting records.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Node 2: Local Market Feasibility -->
+        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                        <span class="text-brand-700">🌾 Node 2:</span> Local Market Feasibility & Rural Dynamics
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-500">Tailored rural intelligence for {{ business.get_business_type_display }} in {{ business.district }}, {{ business.state }}.</p>
+                </div>
+                <span class="text-xs font-bold px-2.5 py-1 rounded bg-blue-50 text-blue-800">
+                    Market Intel
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Demand Profile -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Demand Profile</div>
+                    <p class="text-sm text-slate-700 leading-relaxed font-medium">
+                        {{ report.market_research.demand_profile }}
+                    </p>
+                </div>
+
+                <!-- Channels -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Recommended Sales Channels</div>
+                    <ul class="text-sm text-slate-700 space-y-2">
+                        {% for channel in report.market_research.market_channels %}
+                        <li class="flex items-start gap-2">
+                            <span class="text-brand-600 font-bold">&bull;</span>
+                            <span>{{ channel }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Competition & Capital -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Competition & Capital Cushion</div>
+                    <p class="text-sm text-slate-700 mb-3">
+                        <strong>Competition:</strong> {{ report.market_research.competition_level }}
+                    </p>
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                        <strong>Liquidity:</strong> {{ report.market_research.capital_assessment }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Node 3: Government Schemes & Subsidies -->
+        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                        <span class="text-brand-700">🏛 Node 3:</span> Verified Government Schemes & Subsidies
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-500">Live schemes and subsidies matched via Google Gemini for {{ business.village }}, {{ business.district }}.</p>
+                </div>
+                <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                    <span>✨</span> Gemini AI Grounded
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for scheme in report.government_schemes %}
+                <div class="rounded-2xl border p-6 flex flex-col justify-between transition {% if scheme.is_recommended %}border-brand-500 bg-brand-50/20 ring-1 ring-brand-500 shadow-md shadow-brand-500/5{% else %}border-slate-200 bg-white hover:border-slate-300{% endif %}">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            {% if scheme.is_recommended %}
+                            <span class="text-[11px] font-extrabold uppercase px-2 py-0.5 rounded bg-brand-700 text-white">
+                                ⭐ Highly Recommended
+                            </span>
+                            {% else %}
+                            <span class="text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                                Scheme Option
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <h3 class="text-base font-bold text-slate-900 mb-1 leading-snug">
+                            {{ scheme.name }}
+                        </h3>
+                        <p class="text-xs text-slate-500 mb-3">{{ scheme.ministry }}</p>
+
+                        <div class="space-y-2 text-xs text-slate-700 mb-4">
+                            <p class="bg-white p-2.5 rounded-xl border border-slate-100">
+                                <strong class="text-slate-900">Subsidy / Benefit:</strong><br>
+                                {{ scheme.subsidy_details }}
+                            </p>
+                            <p class="text-slate-600">
+                                <strong>Why this fits:</strong> {{ scheme.match_reason }}
+                            </p>
+                        </div>
+
+                        {% if scheme.required_documents %}
+                        <div class="mb-4">
+                            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Required Documents:</div>
+                            <ul class="text-xs text-slate-600 space-y-1 pl-1">
+                                {% for doc in scheme.required_documents|slice:":4" %}
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-brand-600 font-bold">&#10003;</span>
+                                    <span>{{ doc }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 mt-2">
+                        <p class="text-[11px] text-slate-500 mb-3">
+                            <strong>How to Apply:</strong> {{ scheme.application_process }}
+                        </p>
+                        {% if scheme.official_portal %}
+                        <a href="{{ scheme.official_portal }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-full px-3 py-2 rounded-xl text-xs font-bold text-brand-800 bg-brand-50 hover:bg-brand-100 border border-brand-200 transition">
+                            Visit Official Portal &rarr;
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-3 text-center py-8 text-slate-500 text-sm">
+                    No matching government schemes found for this query.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Node 4: Operational Risks & Mitigations Table -->
+        {% if report.risks_and_mitigations %}
+        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 mb-4 flex items-center gap-2">
+                <span class="text-brand-700">⚠️ Risk Analysis:</span> Operational Vulnerabilities & Safeguards
+            </h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-200 bg-slate-50/75 text-xs uppercase font-extrabold text-slate-500">
+                            <th class="py-3 px-4 rounded-l-xl w-5/12">Risk Factor</th>
+                            <th class="py-3 px-4 rounded-r-xl w-7/12">Recommended Mitigation Strategy</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for item in report.risks_and_mitigations %}
+                        <tr>
+                            <td class="py-3.5 px-4 font-semibold text-slate-900 align-top">
+                                <span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 mb-1">
+                                    Operational Risk
+                                </span>
+                                <div>{{ item.risk }}</div>
+                            </td>
+                            <td class="py-3.5 px-4 text-slate-600 align-top leading-relaxed">
+                                {{ item.mitigation }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Methodology & Assumptions Card -->
+        <div class="p-6 rounded-2xl bg-slate-100/80 border border-slate-200 text-xs text-slate-500 space-y-1">
+            <p><strong>Advisory Methodology:</strong> {{ report.assumptions_and_sources.cost_model }}</p>
+            <p><strong>Scheme Reference Portals:</strong> {{ report.assumptions_and_sources.scheme_sources }}</p>
+            <p>Generated via LangGraph StateGraph Architecture with Google Gemini Model Integration.</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="no-print mt-16 border-t border-slate-200 py-6 text-center text-xs text-slate-500">
+        <p>GramVikas AI Advisory Platform &bull; Built with Django & LangGraph</p>
+    </footer>
+
+</body>
+</html>

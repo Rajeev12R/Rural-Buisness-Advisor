@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Micro-Entrepreneur Dashboard - Rural Business Advisor</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <!-- Top Navigation Bar -->
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <a href="{% url 'home' %}" class="flex items-center space-x-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 to-brand-500 flex items-center justify-center text-white text-2xl shadow-sm group-hover:scale-105 transition-transform">
+                        🌾
+                    </div>
+                    <div>
+                        <span class="text-lg font-extrabold tracking-tight text-slate-900 block leading-tight">GramVikas AI</span>
+                        <span class="text-xs font-semibold text-brand-700 tracking-wide uppercase">Entrepreneur Dashboard</span>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="hidden sm:flex items-center gap-2 bg-slate-100 py-1.5 px-3 rounded-full text-xs font-semibold text-slate-700">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    Logged in: {{ request.user.username }}
+                </div>
+                <form method="post" action="{% url 'logout' %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-red-50 border border-slate-200 transition">
+                        Sign Out
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        
+        <!-- Welcome Hero Banner -->
+        <div class="bg-gradient-to-r from-brand-900 via-brand-800 to-emerald-800 rounded-3xl p-6 sm:p-10 text-white shadow-xl shadow-brand-900/10 mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+            <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-emerald-600/20 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <div class="max-w-2xl relative z-10">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-emerald-200 text-xs font-bold tracking-wide uppercase mb-3">
+                    Rural Micro-Enterprise Portal
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
+                    Welcome back, {{ request.user.username }}!
+                </h1>
+                <p class="text-sm sm:text-base text-emerald-100 font-normal leading-relaxed">
+                    Manage your business profiles, simulate financial scenarios, and access verified government subsidies powered by Gemini AI.
+                </p>
+            </div>
+
+            <div class="relative z-10">
+                <a href="{% url 'create_business' %}" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold text-brand-900 bg-white hover:bg-emerald-50 shadow-md transition-all transform hover:-translate-y-0.5">
+                    <span class="text-lg leading-none">+</span> Register New Business
+                </a>
+            </div>
+        </div>
+
+        <!-- Section Header -->
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-900">Your Registered Businesses</h2>
+                <p class="text-xs sm:text-sm text-slate-500">Each business tracks distinct village locations, capital, and financial plans.</p>
+            </div>
+            <span class="text-xs font-bold px-3 py-1 bg-brand-50 text-brand-800 border border-brand-200 rounded-full">
+                {{ businesses|length }} {% if businesses|length == 1 %}Profile{% else %}Profiles{% endif %}
+            </span>
+        </div>
+
+        <!-- Business Profiles List -->
+        <div class="space-y-8">
+            {% for business in businesses %}
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden hover:border-brand-200 transition">
+                <!-- Card Header -->
+                <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2 flex-wrap">
+                            <h3 class="text-xl font-bold text-slate-900">{{ business.business_name }}</h3>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">
+                                {% if business.business_type == 'dairy' %}🥛 Dairy Farming
+                                {% elif business.business_type == 'grocery' %}🛒 Grocery Shop
+                                {% elif business.business_type == 'tailoring' %}🧵 Tailoring
+                                {% elif business.business_type == 'agriculture' %}🌾 Agriculture
+                                {% elif business.business_type == 'handicraft' %}🎨 Handicrafts
+                                {% else %}💼 {{ business.get_business_type_display }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-500">
+                            <span class="flex items-center gap-1">📍 <strong>Location:</strong> {{ business.village }}, {{ business.district }}, {{ business.state }}</span>
+                            <span class="flex items-center gap-1">💰 <strong>Available Capital:</strong> ₹{{ business.available_capital|floatformat:2 }}</span>
+                            <span class="flex items-center gap-1">📅 <strong>Registered:</strong> {{ business.created_at|date:"d M Y" }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <a href="{% url 'create_financial_plan' business.id %}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-brand-700 hover:bg-brand-800 shadow-sm transition">
+                            + New Financial Plan
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Saved Financial Plans -->
+                <div class="p-6">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">
+                        Saved Financial Plans & AI Advisory Reports ({{ business.financial_plans.all|length }})
+                    </h4>
+
+                    {% if business.financial_plans.all %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for plan in business.financial_plans.all %}
+                        <div class="p-4 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50/60 transition flex flex-col justify-between gap-4">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-semibold text-slate-500">
+                                        Plan #{{ plan.id }} &bull; {{ plan.created_at|date:"d M Y, h:i A" }}
+                                    </span>
+                                    {% if plan.loan_amount > 0 %}
+                                    <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                                        Loan: ₹{{ plan.loan_amount|floatformat:0 }}
+                                    </span>
+                                    {% else %}
+                                    <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        Self-Financed
+                                    </span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-2 text-center my-3 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                                    <div>
+                                        <div class="text-[11px] uppercase font-bold text-slate-400">Revenue</div>
+                                        <div class="text-sm font-extrabold text-slate-900">₹{{ plan.monthly_revenue|floatformat:0 }}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[11px] uppercase font-bold text-slate-400">Fixed Cost</div>
+                                        <div class="text-sm font-extrabold text-slate-900">₹{{ plan.monthly_fixed_costs|floatformat:0 }}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[11px] uppercase font-bold text-slate-400">Var Ratio</div>
+                                        <div class="text-sm font-extrabold text-slate-900">{{ plan.variable_cost_ratio }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-100 flex items-center justify-end">
+                                <a href="{% url 'financial_plan_detail' plan.id %}" class="inline-flex items-center gap-1 text-xs font-bold text-brand-700 hover:text-brand-900 hover:underline">
+                                    View Full AI Advisory Report &rarr;
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-slate-500 text-sm">
+                        <p class="mb-2">No financial plans simulated yet for this business.</p>
+                        <a href="{% url 'create_financial_plan' business.id %}" class="inline-flex items-center text-xs font-bold text-brand-700 hover:underline">
+                            Run first financial feasibility check &rarr;
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <!-- Empty State -->
+            <div class="text-center py-16 px-4 bg-white rounded-3xl border border-dashed border-slate-300">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center text-3xl">
+                    🌾
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">No Businesses Registered Yet</h3>
+                <p class="text-sm text-slate-500 max-w-md mx-auto mb-6">
+                    Start by registering your village enterprise profile (Dairy, Kirana, Tailoring, Agriculture, or Crafts) to receive tailored AI financial advisory.
+                </p>
+                <a href="{% url 'create_business' %}" class="inline-flex items-center px-6 py-3 rounded-xl text-sm font-bold text-white bg-brand-700 hover:bg-brand-800 shadow-sm transition">
+                    Register Your First Business &rarr;
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-500">
+            <p>GramVikas AI Advisory Platform &bull; Built with Django & LangGraph</p>
+        </div>
+    </footer>
+
+</body>
+</html>
