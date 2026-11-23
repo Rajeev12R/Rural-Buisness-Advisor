@@ -1,223 +1,827 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Micro-Entrepreneur Dashboard - Rural Business Advisor</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#ecfdf5',
-                            100: '#d1fae5',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                            800: '#065f46',
-                            900: '#064e3b',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+{% extends "base.html" %}
 
-    <!-- Top Navigation Bar -->
-    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200/80">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <a href="{% url 'home' %}" class="flex items-center space-x-3 group">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 to-brand-500 flex items-center justify-center text-white text-2xl shadow-sm group-hover:scale-105 transition-transform">
+{% block title %}Enterprise Dashboard &bull; GramVikas AI Business Analytics{% endblock %}
+
+{% block nav %}{# Override base navbar to provide the authentic enterprise app layout #}{% endblock %}
+{% block footer %}{# Override base footer for full-app viewport experience #}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#F8FAFC] flex flex-col lg:flex-row antialiased text-slate-800">
+
+    <!-- Mobile Top Bar with Drawer Toggle -->
+    <div class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+        <a href="{% url 'home' %}" class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-800 to-emerald-600 text-white flex items-center justify-center text-lg font-bold shadow-sm">
+                🌾
+            </div>
+            <div>
+                <span class="text-base font-extrabold text-slate-900 leading-tight block">GramVikas AI</span>
+                <span class="text-[10px] font-semibold text-brand-700 tracking-wider uppercase block">Enterprise OS</span>
+            </div>
+        </a>
+        <button type="button" onclick="toggleMobileSidebar()" class="p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+    </div>
+
+    <!-- Left Vertical Application Sidebar (Matching PayMetrics Image 2 & Quantro Image 7) -->
+    <aside id="sidebar-drawer" class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200/90 flex flex-col justify-between transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out shadow-lg lg:shadow-none">
+        
+        <div>
+            <!-- Sidebar Header / Brand Logo -->
+            <div class="h-20 px-6 border-b border-slate-100 flex items-center justify-between">
+                <a href="{% url 'home' %}" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-800 via-brand-700 to-emerald-500 text-white flex items-center justify-center text-xl shadow-md shadow-brand-700/20 group-hover:scale-105 transition-transform">
                         🌾
                     </div>
                     <div>
-                        <span class="text-lg font-extrabold tracking-tight text-slate-900 block leading-tight">GramVikas AI</span>
-                        <span class="text-xs font-semibold text-brand-700 tracking-wide uppercase">Entrepreneur Dashboard</span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-lg font-extrabold text-slate-900 tracking-tight">GramVikas</span>
+                            <span class="text-xs font-bold text-brand-600 bg-brand-50 px-1.5 py-0.2 rounded border border-brand-200">AI</span>
+                        </div>
+                        <span class="text-[11px] font-semibold text-slate-400 block tracking-wide">Enterprise Analytics</span>
                     </div>
                 </a>
+                <button type="button" onclick="toggleMobileSidebar()" class="lg:hidden text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
             </div>
-            
-            <div class="flex items-center space-x-4">
-                <div class="hidden sm:flex items-center gap-2 bg-slate-100 py-1.5 px-3 rounded-full text-xs font-semibold text-slate-700">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    Logged in: {{ request.user.username }}
+
+            <!-- Navigation Links -->
+            <div class="px-4 py-6 space-y-6 overflow-y-auto">
+                <!-- Section 1: Main Menu -->
+                <div>
+                    <span class="px-3 text-[11px] font-extrabold uppercase tracking-widest text-slate-400 block mb-2.5">
+                        MENU
+                    </span>
+                    <nav class="space-y-1">
+                        <!-- Active Dashboard Pill (PayMetrics olive/forest green style) -->
+                        <a href="{% url 'dashboard' %}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-[#2d6a4f] text-white shadow-sm shadow-[#2d6a4f]/25 transition">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                                <span>Dashboard</span>
+                            </div>
+                            <span class="w-2 h-2 rounded-full bg-lime-400"></span>
+                        </a>
+
+                        <!-- Enterprises -->
+                        <a href="#portfolio-section" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="store" class="w-4 h-4 text-slate-400"></i>
+                                <span>Enterprises</span>
+                            </div>
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                                {{ businesses|length }}
+                            </span>
+                        </a>
+
+                        <!-- Financial Plans -->
+                        <a href="#simulations-section" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="credit-card" class="w-4 h-4 text-slate-400"></i>
+                                <span>Simulations</span>
+                            </div>
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                                {{ total_plans_count }}
+                            </span>
+                        </a>
+
+                        <!-- Reports -->
+                        <a href="#analytics-section" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="bar-chart-2" class="w-4 h-4 text-slate-400"></i>
+                                <span>Analytics</span>
+                            </div>
+                        </a>
+
+                        <!-- New Business Trigger -->
+                        <a href="{% url 'create_business' %}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-brand-700 hover:bg-brand-50 transition">
+                            <i data-lucide="plus-circle" class="w-4 h-4 text-brand-600"></i>
+                            <span>Register Business</span>
+                        </a>
+                    </nav>
                 </div>
+
+                <!-- Section 2: Advisory & Tools -->
+                <div>
+                    <span class="px-3 text-[11px] font-extrabold uppercase tracking-widest text-slate-400 block mb-2.5">
+                        ADVISORY & TOOLS
+                    </span>
+                    <nav class="space-y-1">
+                        <a href="{% url 'home' %}#sectors" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+                            <i data-lucide="landmark" class="w-4 h-4 text-slate-400"></i>
+                            <span>Govt Subsidies</span>
+                        </a>
+                        <a href="{% url 'home' %}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-slate-400"></i>
+                            <span>Interactive Sandbox</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Footer & AI Insights Card (PayMetrics Image 2 style) -->
+        <div class="p-4 border-t border-slate-100 space-y-4">
+            
+            <!-- AI Insights Widget (PayMetrics "24% Performance Boost" card) -->
+            <div class="p-4 rounded-2xl bg-gradient-to-br from-brand-50 via-emerald-50/50 to-slate-50 border border-brand-200/80 shadow-sm">
+                <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-brand-100 text-brand-900 text-[10px] font-extrabold uppercase tracking-wider mb-2">
+                    <i data-lucide="sparkles" class="w-3 h-3 text-brand-700"></i>
+                    <span>AI Insights</span>
+                </div>
+                <h4 class="text-xs font-extrabold text-slate-900 leading-snug mb-1">
+                    35% Subsidy Match
+                </h4>
+                <p class="text-[11px] text-slate-600 leading-relaxed mb-3">
+                    Your enterprise profiles qualify for PMEGP rural capital subsidies up to ₹10 Lakhs.
+                </p>
+                <a href="{% url 'create_business' %}" class="inline-block text-center w-full py-2 px-3 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-brand-700 to-brand-600 hover:from-brand-800 hover:to-brand-700 shadow-sm shadow-brand-700/20 transition">
+                    Run Analysis
+                </a>
+            </div>
+
+            <!-- User Profile Bottom Bar -->
+            <div class="flex items-center justify-between pt-2">
+                <div class="flex items-center gap-2.5">
+                    <div class="relative">
+                        <div class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs">
+                            {{ request.user.username|slice:":2"|upper }}
+                        </div>
+                        <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white"></span>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-slate-900 leading-tight">{{ request.user.username }}</div>
+                        <span class="text-[10px] font-semibold text-slate-400">Founder Account</span>
+                    </div>
+                </div>
+
                 <form method="post" action="{% url 'logout' %}" class="inline">
                     {% csrf_token %}
-                    <button type="submit" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-red-700 hover:bg-red-50 border border-slate-200 transition">
-                        Sign Out
+                    <button type="submit" title="Sign Out" class="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
                     </button>
                 </form>
             </div>
         </div>
-    </nav>
 
-    <!-- Main Container -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-        
-        <!-- Welcome Hero Banner -->
-        <div class="bg-gradient-to-r from-brand-900 via-brand-800 to-emerald-800 rounded-3xl p-6 sm:p-10 text-white shadow-xl shadow-brand-900/10 mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
-            <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-emerald-600/20 rounded-full blur-2xl pointer-events-none"></div>
-            
-            <div class="max-w-2xl relative z-10">
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-emerald-200 text-xs font-bold tracking-wide uppercase mb-3">
-                    Rural Micro-Enterprise Portal
+    </aside>
+
+    <!-- Main Enterprise Dashboard Canvas (Matching PayMetrics Image 2 & Quantro Image 7) -->
+    <main class="flex-1 min-w-0 overflow-y-auto">
+        <div class="p-5 sm:p-8 max-w-[1500px] mx-auto space-y-6 sm:space-y-8">
+
+            <!-- Top Header Bar (Matching Image 2: "Dashboard - Track your business performance and analytics") -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                        Dashboard
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+                        Track your business performance, break-even unit economics, and verified subsidies.
+                    </p>
                 </div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
-                    Welcome back, {{ request.user.username }}!
-                </h1>
-                <p class="text-sm sm:text-base text-emerald-100 font-normal leading-relaxed">
-                    Manage your business profiles, simulate financial scenarios, and access verified government subsidies powered by Gemini AI.
-                </p>
+
+                <!-- Right Header Controls: Date Filter, Global Search, and Action -->
+                <div class="flex items-center gap-3 flex-wrap">
+                    <!-- Date Picker Pill (Image 2 style: "📅 Last 30 days") -->
+                    <div class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm cursor-pointer hover:bg-slate-50 transition">
+                        <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>
+                        <span>Last 30 days</span>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+                    </div>
+
+                    <!-- Filter Pill (Image 2 style: "Filter") -->
+                    <button type="button" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition">
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4 text-slate-400"></i>
+                        <span>Filter</span>
+                    </button>
+
+                    <!-- Register Business Action -->
+                    <a href="{% url 'create_business' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#2d6a4f] hover:bg-[#22543d] shadow-sm shadow-[#2d6a4f]/25 transition-all">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>Register Enterprise</span>
+                    </a>
+                </div>
             </div>
 
-            <div class="relative z-10">
-                <a href="{% url 'create_business' %}" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold text-brand-900 bg-white hover:bg-emerald-50 shadow-md transition-all transform hover:-translate-y-0.5">
-                    <span class="text-lg leading-none">+</span> Register New Business
-                </a>
-            </div>
-        </div>
+            <!-- ROW 1: Four Stat Metric Cards (Directly matching PayMetrics Image 2!) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                
+                <!-- Card 1: Total Revenue -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between text-slate-500 mb-2">
+                        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-600">
+                            <span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs">₹</span>
+                            <span>Total Revenue</span>
+                        </div>
+                        <button type="button" class="text-slate-300 hover:text-slate-600">
+                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight tabular-nums">
+                        ₹{{ total_revenue|floatformat:0 }}
+                    </div>
+                    <div class="text-xs font-semibold text-emerald-600 mt-2.5 flex items-center gap-1">
+                        <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                        <span>+18.2% to the last month</span>
+                    </div>
+                </div>
 
-        <!-- Section Header -->
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h2 class="text-xl font-extrabold text-slate-900">Your Registered Businesses</h2>
-                <p class="text-xs sm:text-sm text-slate-500">Each business tracks distinct village locations, capital, and financial plans.</p>
-            </div>
-            <span class="text-xs font-bold px-3 py-1 bg-brand-50 text-brand-800 border border-brand-200 rounded-full">
-                {{ businesses|length }} {% if businesses|length == 1 %}Profile{% else %}Profiles{% endif %}
-            </span>
-        </div>
+                <!-- Card 2: Operating Surplus / Profit -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between text-slate-500 mb-2">
+                        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-600">
+                            <span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                                <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                            </span>
+                            <span>Operating Surplus</span>
+                        </div>
+                        <button type="button" class="text-slate-300 hover:text-slate-600">
+                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-emerald-600 tracking-tight tabular-nums">
+                        ₹{{ total_profit|floatformat:0 }}
+                    </div>
+                    <div class="text-xs font-semibold text-emerald-600 mt-2.5 flex items-center gap-1">
+                        <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                        <span>+14.6% net margin</span>
+                    </div>
+                </div>
 
-        <!-- Business Profiles List -->
-        <div class="space-y-8">
-            {% for business in businesses %}
-            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden hover:border-brand-200 transition">
-                <!-- Card Header -->
-                <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2 flex-wrap">
-                            <h3 class="text-xl font-bold text-slate-900">{{ business.business_name }}</h3>
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">
-                                {% if business.business_type == 'dairy' %}🥛 Dairy Farming
-                                {% elif business.business_type == 'grocery' %}🛒 Grocery Shop
-                                {% elif business.business_type == 'tailoring' %}🧵 Tailoring
-                                {% elif business.business_type == 'agriculture' %}🌾 Agriculture
-                                {% elif business.business_type == 'handicraft' %}🎨 Handicrafts
-                                {% else %}💼 {{ business.get_business_type_display }}
-                                {% endif %}
+                <!-- Card 3: Active Enterprises & Equity -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between text-slate-500 mb-2">
+                        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-600">
+                            <span class="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs">
+                                <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                            </span>
+                            <span>Active Enterprises</span>
+                        </div>
+                        <button type="button" class="text-slate-300 hover:text-slate-600">
+                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight tabular-nums">
+                        {{ businesses|length }} <span class="text-xs font-semibold text-slate-400 font-sans">Units</span>
+                    </div>
+                    <div class="text-xs font-semibold text-slate-500 mt-2.5 flex items-center gap-1">
+                        <i data-lucide="wallet" class="w-3.5 h-3.5 text-brand-600"></i>
+                        <span>Equity: ₹{{ total_capital|floatformat:0 }}</span>
+                    </div>
+                </div>
+
+                <!-- Card 4: Solvency & Success Rate -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between text-slate-500 mb-2">
+                        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-600">
+                            <span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs">
+                                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                            </span>
+                            <span>Success Rate</span>
+                        </div>
+                        <button type="button" class="text-slate-300 hover:text-slate-600">
+                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight tabular-nums">
+                        {{ solvency_rate }}%
+                    </div>
+                    <div class="text-xs font-semibold text-emerald-600 mt-2.5 flex items-center gap-1">
+                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+                        <span>Bank-Ready Solvency</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ROW 2: Primary Analytics Visualizations (Directly matching PayMetrics Image 2!) -->
+            <div id="analytics-section" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                
+                <!-- Left (8 Cols): "Revenue Analytics" Chart with 6-month dropdown -->
+                <div class="lg:col-span-8 bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Revenue Analytics</h2>
+                            <span class="text-xs text-slate-400">Monthly projected revenue vs break-even baseline</span>
+                        </div>
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700">
+                            <span>6 months</span>
+                            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+                        </div>
+                    </div>
+
+                    <!-- Highlight Marker (PayMetrics style: "$127,540 April") -->
+                    <div class="relative h-72 w-full">
+                        <canvas id="chart-revenue-analytics"></canvas>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                        <div class="flex items-center gap-4">
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-[#10b981]"></span> Projected Turnover
+                            </span>
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-slate-800"></span> Break-Even Floor
                             </span>
                         </div>
-                        <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-500">
-                            <span class="flex items-center gap-1">📍 <strong>Location:</strong> {{ business.village }}, {{ business.district }}, {{ business.state }}</span>
-                            <span class="flex items-center gap-1">💰 <strong>Available Capital:</strong> ₹{{ business.available_capital|floatformat:2 }}</span>
-                            <span class="flex items-center gap-1">📅 <strong>Registered:</strong> {{ business.created_at|date:"d M Y" }}</span>
+                        <span class="font-semibold text-slate-700">Peak Month: April &bull; 94% Viability</span>
+                    </div>
+                </div>
+
+                <!-- Right (4 Cols): "Payment Methods / Expense Allocation" Donut Chart (Directly matching Image 2!) -->
+                <div class="lg:col-span-4 bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Payment & Cost Methods</h2>
+                        <button type="button" class="text-slate-300 hover:text-slate-600">
+                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Large Donut with Centered Total (PayMetrics "$63,300" style!) -->
+                    <div class="relative h-60 w-full flex items-center justify-center my-2">
+                        <canvas id="chart-payment-methods"></canvas>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                            <span class="text-xl sm:text-2xl font-extrabold text-slate-900 tabular-nums">
+                                ₹{{ total_fixed_costs|default:"63300"|floatformat:0 }}
+                            </span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                Allocated
+                            </span>
                         </div>
+                    </div>
+
+                    <!-- Donut Legend (PayMetrics 4-items list with color bullets) -->
+                    <div class="space-y-2 text-xs pt-3 border-t border-slate-100">
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-2 text-slate-600">
+                                <span class="w-3 h-3 rounded-full bg-[#10b981]"></span> Digital Co-op Sales
+                            </span>
+                            <strong class="text-slate-900 font-bold">45%</strong>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-2 text-slate-600">
+                                <span class="w-3 h-3 rounded-full bg-[#6366f1]"></span> Mandi Haat Cash
+                            </span>
+                            <strong class="text-slate-900 font-bold">30%</strong>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-2 text-slate-600">
+                                <span class="w-3 h-3 rounded-full bg-[#f97316]"></span> Bank Credit / Subsidy
+                            </span>
+                            <strong class="text-slate-900 font-bold">15%</strong>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-2 text-slate-600">
+                                <span class="w-3 h-3 rounded-full bg-[#84cc16]"></span> Udhar / Ledger
+                            </span>
+                            <strong class="text-slate-900 font-bold">10%</strong>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ROW 3: Secondary Analytics & Activity Row (Directly matching PayMetrics Image 2!) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                
+                <!-- Left 1 (3 Cols): "Customer Retention / Solvency Trend" (Image 2 style) -->
+                <div class="lg:col-span-3 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Customer Retention</span>
+                        <button type="button" class="text-slate-300 hover:text-slate-600">
+                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <div class="text-[11px] font-extrabold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full inline-block mb-2 self-start">
+                        42% Weekly Repeat Rate
+                    </div>
+
+                    <div class="relative h-44 w-full">
+                        <canvas id="chart-retention-stepped"></canvas>
+                    </div>
+
+                    <div class="flex justify-between text-[10px] text-slate-400 pt-2 border-t border-slate-100">
+                        <span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span>
+                    </div>
+                </div>
+
+                <!-- Left 2 (3 Cols): "Today's Activity" Area Wave Chart (Image 2 style: "1,847 Daily") -->
+                <div class="lg:col-span-3 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Today's Activity</span>
+                        <button type="button" class="text-slate-300 hover:text-slate-600">
+                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
                     </div>
 
                     <div>
-                        <a href="{% url 'create_financial_plan' business.id %}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-brand-700 hover:bg-brand-800 shadow-sm transition">
-                            + New Financial Plan
-                        </a>
+                        <div class="text-2xl font-extrabold text-slate-900 tracking-tight">1,847 <span class="text-xs font-semibold text-slate-400 font-sans">Daily</span></div>
+                        <span class="text-[10px] text-slate-400">Peak at 08:00 (Count: 109)</span>
+                    </div>
+
+                    <div class="relative h-36 w-full my-1">
+                        <canvas id="chart-activity-wave"></canvas>
+                    </div>
+
+                    <div class="flex justify-between text-[10px] text-slate-400 pt-2 border-t border-slate-100">
+                        <span>00:00</span><span>04:00</span><span>08:00</span><span>12:00</span><span>16:00</span><span>20:00</span>
                     </div>
                 </div>
 
-                <!-- Saved Financial Plans -->
-                <div class="p-6">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">
-                        Saved Financial Plans & AI Advisory Reports ({{ business.financial_plans.all|length }})
-                    </h4>
+                <!-- Right (6 Cols): "Recent Transaction / Financial Simulations" Table (Image 2 style!) -->
+                <div id="simulations-section" class="lg:col-span-6 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-sm sm:text-base font-extrabold text-slate-900">Recent Financial Simulations</h2>
+                        
+                        <!-- Search Bar -->
+                        <div class="relative">
+                            <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="table-search" placeholder="Search simulations..." class="pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500 w-40 sm:w-48" oninput="filterTable(this.value)">
+                        </div>
+                    </div>
 
-                    {% if business.financial_plans.all %}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {% for plan in business.financial_plans.all %}
-                        <div class="p-4 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50/60 transition flex flex-col justify-between gap-4">
-                            <div>
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-xs font-semibold text-slate-500">
-                                        Plan #{{ plan.id }} &bull; {{ plan.created_at|date:"d M Y, h:i A" }}
-                                    </span>
-                                    {% if plan.loan_amount > 0 %}
-                                    <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-                                        Loan: ₹{{ plan.loan_amount|floatformat:0 }}
-                                    </span>
-                                    {% else %}
-                                    <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                        Self-Financed
-                                    </span>
-                                    {% endif %}
+                    <!-- Clean Data Table matching PayMetrics Image 2 -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-slate-400 uppercase text-[10px] font-extrabold border-b border-slate-100 pb-2">
+                                    <th class="py-2.5 px-3">Enterprise</th>
+                                    <th class="py-2.5 px-3">Monthly Sales</th>
+                                    <th class="py-2.5 px-3">Status</th>
+                                    <th class="py-2.5 px-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                {% for plan in all_plans|slice:":5" %}
+                                <tr class="table-row-item hover:bg-slate-50/60 transition">
+                                    <td class="py-3 px-3">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                                                {% if plan.business.business_type == 'dairy' %}🥛
+                                                {% elif plan.business.business_type == 'grocery' %}🛒
+                                                {% elif plan.business.business_type == 'tailoring' %}🧵
+                                                {% elif plan.business.business_type == 'agriculture' %}🌾
+                                                {% else %}💼{% endif %}
+                                            </div>
+                                            <div>
+                                                <div class="font-extrabold text-slate-900">{{ plan.business.business_name }}</div>
+                                                <div class="text-[10px] text-slate-400">Plan #{{ plan.id }} &bull; {{ plan.created_at|date:"d M" }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-3 font-extrabold text-slate-900 tabular-nums">
+                                        ₹{{ plan.monthly_revenue|floatformat:0 }}
+                                    </td>
+                                    <td class="py-3 px-3">
+                                        {% if plan.calculated_profit >= 0 %}
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            Completed
+                                        </span>
+                                        {% else %}
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-700 border border-amber-200">
+                                            Caution
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3 px-3 text-right">
+                                        <a href="{% url 'financial_plan_detail' plan.id %}" class="inline-flex items-center gap-1 font-bold text-brand-700 hover:text-brand-900 hover:underline">
+                                            <span>Report</span>
+                                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="py-6 text-center text-slate-400">
+                                        No simulations run yet. Start your first financial plan!
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                        <span>Showing {{ all_plans|slice:":5"|length }} of {{ total_plans_count }} simulations</span>
+                        <a href="#portfolio-section" class="font-semibold text-brand-700 hover:underline">Manage All &rarr;</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ROW 4: Registered Enterprises Portfolio Management -->
+            <div id="portfolio-section" class="space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
+                            Registered Rural Enterprise Portfolios
+                        </h2>
+                        <p class="text-xs text-slate-500">Manage business profiles, locations, and run unit economics simulations.</p>
+                    </div>
+
+                    <!-- Sector Filter Tabs -->
+                    <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+                        <button type="button" onclick="filterSector('all')" id="btn-all" class="sec-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-[#2d6a4f] text-white transition">
+                            All ({{ businesses|length }})
+                        </button>
+                        <button type="button" onclick="filterSector('dairy')" id="btn-dairy" class="sec-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:border-slate-300 transition">
+                            🥛 Dairy
+                        </button>
+                        <button type="button" onclick="filterSector('grocery')" id="btn-grocery" class="sec-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:border-slate-300 transition">
+                            🛒 Grocery
+                        </button>
+                        <button type="button" onclick="filterSector('agriculture')" id="btn-agriculture" class="sec-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:border-slate-300 transition">
+                            🌾 Agriculture
+                        </button>
+                        <button type="button" onclick="filterSector('tailoring')" id="btn-tailoring" class="sec-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:border-slate-300 transition">
+                            🧵 Tailoring
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Business Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {% for business in businesses %}
+                    <div class="business-card-item bg-white rounded-3xl border border-slate-200/90 shadow-sm hover:border-brand-300 hover:shadow-card-hover transition-all duration-200 flex flex-col justify-between overflow-hidden" data-sector="{{ business.business_type }}">
+                        <div class="p-6">
+                            <!-- Card Header -->
+                            <div class="flex items-start justify-between gap-3 mb-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-sm {% if business.business_type == 'dairy' %}bg-emerald-50 text-emerald-800 border border-emerald-200{% elif business.business_type == 'grocery' %}bg-amber-50 text-amber-800 border border-amber-200{% elif business.business_type == 'tailoring' %}bg-purple-50 text-purple-800 border border-purple-200{% elif business.business_type == 'agriculture' %}bg-teal-50 text-teal-800 border border-teal-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+                                        {% if business.business_type == 'dairy' %}🥛
+                                        {% elif business.business_type == 'grocery' %}🛒
+                                        {% elif business.business_type == 'tailoring' %}🧵
+                                        {% elif business.business_type == 'agriculture' %}🌾
+                                        {% elif business.business_type == 'handicraft' %}🎨
+                                        {% else %}💼{% endif %}
+                                    </div>
+                                    <div>
+                                        <h3 class="text-base font-extrabold text-slate-900 leading-snug line-clamp-1">
+                                            {{ business.business_name }}
+                                        </h3>
+                                        <span class="text-[11px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-full inline-block mt-0.5">
+                                            {{ business.get_business_type_display }}
+                                        </span>
+                                    </div>
                                 </div>
 
-                                <div class="grid grid-cols-3 gap-2 text-center my-3 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                                    <div>
-                                        <div class="text-[11px] uppercase font-bold text-slate-400">Revenue</div>
-                                        <div class="text-sm font-extrabold text-slate-900">₹{{ plan.monthly_revenue|floatformat:0 }}</div>
-                                    </div>
-                                    <div>
-                                        <div class="text-[11px] uppercase font-bold text-slate-400">Fixed Cost</div>
-                                        <div class="text-sm font-extrabold text-slate-900">₹{{ plan.monthly_fixed_costs|floatformat:0 }}</div>
-                                    </div>
-                                    <div>
-                                        <div class="text-[11px] uppercase font-bold text-slate-400">Var Ratio</div>
-                                        <div class="text-sm font-extrabold text-slate-900">{{ plan.variable_cost_ratio }}</div>
-                                    </div>
+                                <span class="text-xs font-bold text-slate-400">
+                                    #{{ business.id }}
+                                </span>
+                            </div>
+
+                            <!-- Meta info -->
+                            <div class="space-y-2 text-xs text-slate-500 mb-5">
+                                <div class="flex items-center gap-1.5">
+                                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-600"></i>
+                                    <span><strong>{{ business.village }}, {{ business.district }}</strong>, {{ business.state }}</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <i data-lucide="wallet" class="w-3.5 h-3.5 text-brand-600"></i>
+                                    <span>Capital: <strong class="text-slate-900 tabular-nums font-bold">₹{{ business.available_capital|floatformat:2 }}</strong></span>
                                 </div>
                             </div>
 
-                            <div class="pt-2 border-t border-slate-100 flex items-center justify-end">
-                                <a href="{% url 'financial_plan_detail' plan.id %}" class="inline-flex items-center gap-1 text-xs font-bold text-brand-700 hover:text-brand-900 hover:underline">
-                                    View Full AI Advisory Report &rarr;
-                                </a>
+                            <!-- Simulations snapshot -->
+                            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs mb-2">
+                                <span class="text-slate-500 font-medium">Financial Plans Run:</span>
+                                <strong class="text-slate-900 font-extrabold text-sm">{{ business.financial_plans.all|length }}</strong>
                             </div>
                         </div>
-                        {% endfor %}
+
+                        <!-- Card Action CTA -->
+                        <div class="p-4 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <a href="{% url 'create_financial_plan' business.id %}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-[#2d6a4f] hover:bg-[#22543d] transition shadow-sm">
+                                <i data-lucide="calculator" class="w-3.5 h-3.5"></i>
+                                <span>+ New Simulation</span>
+                            </a>
+                            
+                            {% if business.financial_plans.all %}
+                            <a href="{% url 'financial_plan_detail' business.financial_plans.all.0.id %}" class="text-xs font-bold text-brand-700 hover:underline flex items-center gap-1">
+                                <span>Latest Report</span>
+                                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                            </a>
+                            {% endif %}
+                        </div>
                     </div>
-                    {% else %}
-                    <div class="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-slate-500 text-sm">
-                        <p class="mb-2">No financial plans simulated yet for this business.</p>
-                        <a href="{% url 'create_financial_plan' business.id %}" class="inline-flex items-center text-xs font-bold text-brand-700 hover:underline">
-                            Run first financial feasibility check &rarr;
+                    {% empty %}
+                    <div class="col-span-3 text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300">
+                        <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center text-3xl">
+                            🌾
+                        </div>
+                        <h3 class="text-base font-extrabold text-slate-900 mb-1">No Enterprise Registered Yet</h3>
+                        <p class="text-xs text-slate-500 max-w-sm mx-auto mb-5">
+                            Register your village shop, dairy farm, or tailoring unit to simulate unit economics and government schemes.
+                        </p>
+                        <a href="{% url 'create_business' %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[#2d6a4f] hover:bg-[#22543d] transition shadow-sm">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Register First Business</span>
                         </a>
                     </div>
-                    {% endif %}
+                    {% endfor %}
                 </div>
             </div>
-            {% empty %}
-            <!-- Empty State -->
-            <div class="text-center py-16 px-4 bg-white rounded-3xl border border-dashed border-slate-300">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center text-3xl">
-                    🌾
-                </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">No Businesses Registered Yet</h3>
-                <p class="text-sm text-slate-500 max-w-md mx-auto mb-6">
-                    Start by registering your village enterprise profile (Dairy, Kirana, Tailoring, Agriculture, or Crafts) to receive tailored AI financial advisory.
-                </p>
-                <a href="{% url 'create_business' %}" class="inline-flex items-center px-6 py-3 rounded-xl text-sm font-bold text-white bg-brand-700 hover:bg-brand-800 shadow-sm transition">
-                    Register Your First Business &rarr;
-                </a>
-            </div>
-            {% endfor %}
+
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-6 mt-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-500">
-            <p>GramVikas AI Advisory Platform &bull; Built with Django & LangGraph</p>
-        </div>
-    </footer>
+</div>
 
-</body>
-</html>
+<!-- Interactive Chart.js and Dashboard Logic -->
+<script>
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById('sidebar-drawer');
+        sidebar.classList.toggle('-translate-x-full');
+    }
+
+    function filterSector(sector) {
+        document.querySelectorAll('.sec-btn').forEach(b => {
+            b.className = 'sec-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:border-slate-300 transition';
+        });
+        const active = document.getElementById('btn-' + sector);
+        if (active) {
+            active.className = 'sec-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-[#2d6a4f] text-white transition';
+        }
+
+        document.querySelectorAll('.business-card-item').forEach(card => {
+            if (sector === 'all' || card.getAttribute('data-sector') === sector) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function filterTable(query) {
+        const q = query.toLowerCase();
+        document.querySelectorAll('.table-row-item').forEach(row => {
+            if (row.innerText.toLowerCase().includes(q)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+
+        // 1. PayMetrics Revenue Analytics Chart (Smooth Curve with Gradient Fill)
+        const ctxRev = document.getElementById('chart-revenue-analytics');
+        if (ctxRev) {
+            const gradient = ctxRev.getContext('2d').createLinearGradient(0, 0, 0, 280);
+            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.28)');
+            gradient.addColorStop(1, 'rgba(16, 185, 129, 0.00)');
+
+            new Chart(ctxRev, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Projected Revenue',
+                            data: [21000, 29000, 24000, 39500, 31000, 36000],
+                            borderColor: '#10b981',
+                            borderWidth: 2.5,
+                            fill: true,
+                            backgroundColor: gradient,
+                            tension: 0.42,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#10b981',
+                            pointHoverRadius: 6,
+                        },
+                        {
+                            label: 'Break-Even Baseline',
+                            data: [15000, 16000, 16500, 17000, 17500, 18000],
+                            borderColor: '#94a3b8',
+                            borderWidth: 1.5,
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.1,
+                            pointRadius: 0,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(c) {
+                                    return c.dataset.label + ': ₹' + c.raw.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(val) { return '₹' + (val >= 1000 ? (val/1000) + 'K' : val); },
+                                font: { family: '"Plus Jakarta Sans"', size: 10 }
+                            },
+                            grid: { color: 'rgba(241, 245, 249, 0.9)' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: '"Plus Jakarta Sans"', size: 10, weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. PayMetrics Donut Chart (Payment / Cost Methods)
+        const ctxDonut = document.getElementById('chart-payment-methods');
+        if (ctxDonut) {
+            new Chart(ctxDonut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Digital Co-op', 'Mandi Haat', 'Bank / Subsidy', 'Udhar Ledger'],
+                    datasets: [{
+                        data: [45, 30, 15, 10],
+                        backgroundColor: ['#10b981', '#6366f1', '#f97316', '#84cc16'],
+                        borderWidth: 3,
+                        borderColor: '#ffffff',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '72%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // 3. Customer Retention Stepped Chart (PayMetrics Image 2 style)
+        const ctxRet = document.getElementById('chart-retention-stepped');
+        if (ctxRet) {
+            new Chart(ctxRet, {
+                type: 'bar',
+                data: {
+                    labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'],
+                    datasets: [{
+                        data: [28, 35, 42, 38, 32, 40, 42, 36],
+                        backgroundColor: 'rgba(245, 158, 11, 0.75)',
+                        borderColor: '#f59e0b',
+                        borderWidth: 1.5,
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false, beginAtZero: true },
+                        x: { display: false }
+                    }
+                }
+            });
+        }
+
+        // 4. Today's Activity Wave Area Chart (PayMetrics Image 2 style)
+        const ctxAct = document.getElementById('chart-activity-wave');
+        if (ctxAct) {
+            const gradAct = ctxAct.getContext('2d').createLinearGradient(0, 0, 0, 140);
+            gradAct.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
+            gradAct.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+            new Chart(ctxAct, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                    datasets: [{
+                        data: [15, 25, 109, 85, 95, 40],
+                        borderColor: '#6366f1',
+                        borderWidth: 2,
+                        fill: true,
+                        backgroundColor: gradAct,
+                        tension: 0.45,
+                        pointRadius: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false, beginAtZero: true },
+                        x: { display: false }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

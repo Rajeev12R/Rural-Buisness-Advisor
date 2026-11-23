@@ -1,148 +1,408 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Feasibility Plan - {{ business.business_name }}</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#ecfdf5',
-                            100: '#d1fae5',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                            800: '#065f46',
-                            900: '#064e3b',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        form p {
-            margin-bottom: 1.25rem;
-        }
-        form label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #334155;
-            margin-bottom: 0.375rem;
-        }
-        form input, form select, form textarea {
-            width: 100%;
-            padding: 0.625rem 0.875rem;
-            border-radius: 0.75rem;
-            border: 1px solid #cbd5e1;
-            font-size: 0.875rem;
-            background-color: #ffffff;
-            transition: all 0.15s ease-in-out;
-        }
-        form input:focus, form select:focus {
-            outline: none;
-            border-color: #059669;
-            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
-        }
-        .helptext {
-            display: block;
-            font-size: 0.75rem;
-            color: #64748b;
-            margin-top: 0.25rem;
-        }
-        .errorlist {
-            list-style: none;
-            padding: 0;
-            margin-bottom: 0.5rem;
-            color: #dc2626;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-    </style>
-</head>
-<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+{% extends "base.html" %}
 
-    <!-- Top Navigation Bar -->
-    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200/80">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <a href="{% url 'dashboard' %}" class="flex items-center space-x-3 group">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 to-brand-500 flex items-center justify-center text-white text-2xl shadow-sm">
-                    🌾
-                </div>
-                <div>
-                    <span class="text-lg font-extrabold tracking-tight text-slate-900 block leading-tight">GramVikas AI</span>
-                    <span class="text-xs font-semibold text-brand-700 tracking-wide uppercase">Financial Planning Form</span>
-                </div>
-            </a>
+{% block title %}Simulate Financial Plan &bull; {{ business.business_name }} &bull; GramVikas AI{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+
+    <!-- Back Navigation & Title -->
+    <div class="mb-8">
+        <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-brand-800 transition mb-3">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            <span>Back to Dashboard</span>
+        </a>
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <a href="{% url 'dashboard' %}" class="text-sm font-semibold text-slate-600 hover:text-slate-900">
-                    &larr; Back to Dashboard
-                </a>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-brand-50 text-brand-800 border border-brand-200">
+                        {{ business.get_business_type_display }}
+                    </span>
+                    <span class="text-xs text-slate-500 font-medium">📍 {{ business.village }}, {{ business.district }}, {{ business.state }}</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                    Financial Feasibility Simulation &bull; {{ business.business_name }}
+                </h1>
+            </div>
+
+            <div class="bg-white px-4 py-2 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
+                <div class="text-xs text-slate-500">Available Equity:</div>
+                <div class="text-base font-extrabold text-brand-800 tabular-nums">₹{{ business.available_capital|floatformat:2 }}</div>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <!-- Main Content Form -->
-    <main class="flex-grow max-w-xl w-full mx-auto px-4 sm:px-6 py-12">
-        <div class="bg-white rounded-3xl border border-slate-200/80 p-8 sm:p-10 shadow-lg shadow-slate-200/40">
-            
-            <div class="mb-6">
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-50 border border-brand-200 text-brand-800 text-xs font-bold uppercase mb-3">
-                    {{ business.get_business_type_display }} &bull; {{ business.village }}, {{ business.district }}
-                </div>
-                <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Financial Plan: {{ business.business_name }}</h1>
-                <p class="text-sm text-slate-500 mt-1">
-                    Enter expected monthly cash flow numbers. Our LangGraph pipeline will analyze profitability, break-even targets, and match government schemes.
-                </p>
-            </div>
-
-            <!-- Helpful Guidance Callout -->
-            <div class="bg-amber-50 border border-amber-200/80 rounded-2xl p-4 mb-6 text-xs text-amber-900 flex items-start gap-3">
-                <span class="text-base leading-none">💡</span>
-                <div>
-                    <strong>Pro-Tip:</strong> Variable Cost Ratio is entered as a decimal. For instance, <code>0.60</code> represents 60% of sales going towards raw materials, cattle feed, or retail inventory.
-                </div>
-            </div>
-
-            <!-- Form -->
-            <form method="post" class="space-y-4">
+    <!-- Main Grid: Form Left, Real-time Simulation Sandbox Right -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Input Form -->
+        <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200/90 p-7 sm:p-9 shadow-sm">
+            <form method="post" id="plan-form" onsubmit="showLoadingOverlay()">
                 {% csrf_token %}
-                {{ form.as_p }}
 
-                <div class="pt-4">
-                    <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-brand-700 to-brand-600 hover:from-brand-800 hover:to-brand-700 shadow-lg shadow-brand-700/25 transition-all transform hover:-translate-y-0.5">
-                        <span>⚡</span> Run LangGraph Advisory & Generate Report &rarr;
+                {% if form.non_field_errors %}
+                <div class="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-900 text-xs font-semibold space-y-1">
+                    {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Section 1: Operating Economics -->
+                <div class="mb-8">
+                    <div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100">
+                        <span class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs font-bold">1</span>
+                        <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-800">Operating Revenue & Costs</h2>
+                    </div>
+
+                    <!-- Monthly Revenue -->
+                    <div class="mb-5">
+                        <label for="id_monthly_revenue" class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-2">
+                            Projected Monthly Revenue / Sales (₹) <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 font-bold">₹</span>
+                            <input type="number" step="0.01" min="0" name="monthly_revenue" id="id_monthly_revenue" required
+                                value="{{ form.monthly_revenue.value|default:'65000' }}"
+                                placeholder="65000"
+                                class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition tabular-nums font-semibold"
+                                oninput="simulateRealtime()">
+                        </div>
+                        <span class="block text-xs text-slate-500 mt-1">Expected gross collections per month from customers/co-op buyers.</span>
+                        {% if form.monthly_revenue.errors %}
+                        <p class="text-xs font-semibold text-red-600 mt-1.5">{{ form.monthly_revenue.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Monthly Fixed Costs -->
+                    <div class="mb-5">
+                        <label for="id_monthly_fixed_costs" class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-2">
+                            Monthly Fixed Costs (₹) <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 font-bold">₹</span>
+                            <input type="number" step="0.01" min="0" name="monthly_fixed_costs" id="id_monthly_fixed_costs" required
+                                value="{{ form.monthly_fixed_costs.value|default:'15000' }}"
+                                placeholder="15000"
+                                class="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition tabular-nums font-semibold"
+                                oninput="simulateRealtime()">
+                        </div>
+                        <span class="block text-xs text-slate-500 mt-1">Rent, permanent labor, utilities, minimum electricity bills.</span>
+                        {% if form.monthly_fixed_costs.errors %}
+                        <p class="text-xs font-semibold text-red-600 mt-1.5">{{ form.monthly_fixed_costs.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Variable Cost Ratio -->
+                    <div class="mb-5">
+                        <div class="flex justify-between items-center mb-2">
+                            <label for="id_variable_cost_ratio" class="block text-xs font-extrabold uppercase tracking-wider text-slate-700">
+                                Variable Cost Ratio (0.00 – 0.99) <span class="text-red-500">*</span>
+                            </label>
+                            <span id="slider-ratio-label" class="text-xs font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded">
+                                55% (0.55)
+                            </span>
+                        </div>
+                        <div class="space-y-2">
+                            <input type="range" id="ratio-slider" min="0.05" max="0.95" step="0.01" value="{{ form.variable_cost_ratio.value|default:'0.55' }}" class="w-full accent-emerald-600 cursor-pointer" oninput="syncSliderToInput(this.value)">
+                            <input type="number" step="0.0001" min="0" max="0.9999" name="variable_cost_ratio" id="id_variable_cost_ratio" required
+                                value="{{ form.variable_cost_ratio.value|default:'0.55' }}"
+                                class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition tabular-nums font-semibold"
+                                oninput="syncInputToSlider(this.value)">
+                        </div>
+                        <span class="block text-xs text-slate-500 mt-1">Fraction of sales spent on stock replenishment, feed, raw materials (e.g. 0.55 = 55%).</span>
+                        {% if form.variable_cost_ratio.errors %}
+                        <p class="text-xs font-semibold text-red-600 mt-1.5">{{ form.variable_cost_ratio.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Section 2: Bank Financing (Optional Loan) -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center text-xs font-bold">2</span>
+                            <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-800">Bank Loan Financing (Optional)</h2>
+                        </div>
+                        <span class="text-[11px] font-semibold text-slate-400">PMEGP / MUDRA / KCC</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <!-- Loan Amount -->
+                        <div>
+                            <label for="id_loan_amount" class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-2">
+                                Loan Principal (₹)
+                            </label>
+                            <input type="number" step="0.01" min="0" name="loan_amount" id="id_loan_amount"
+                                value="{{ form.loan_amount.value|default:'0' }}"
+                                placeholder="0"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition tabular-nums font-semibold"
+                                oninput="simulateRealtime()">
+                            {% if form.loan_amount.errors %}
+                            <p class="text-xs font-semibold text-red-600 mt-1.5">{{ form.loan_amount.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Interest Rate -->
+                        <div>
+                            <label for="id_annual_interest_rate" class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-2">
+                                Annual Rate (%)
+                            </label>
+                            <input type="number" step="0.01" min="0" name="annual_interest_rate" id="id_annual_interest_rate"
+                                value="{{ form.annual_interest_rate.value|default:'8.5' }}"
+                                placeholder="8.5"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition tabular-nums font-semibold"
+                                oninput="simulateRealtime()">
+                            {% if form.annual_interest_rate.errors %}
+                            <p class="text-xs font-semibold text-red-600 mt-1.5">{{ form.annual_interest_rate.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Tenure Months -->
+                        <div>
+                            <label for="id_loan_tenure_months" class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-2">
+                                Tenure (Months)
+                            </label>
+                            <input type="number" min="1" name="loan_tenure_months" id="id_loan_tenure_months"
+                                value="{{ form.loan_tenure_months.value|default:'36' }}"
+                                placeholder="36"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition tabular-nums font-semibold"
+                                oninput="simulateRealtime()">
+                            {% if form.loan_tenure_months.errors %}
+                            <p class="text-xs font-semibold text-red-600 mt-1.5">{{ form.loan_tenure_months.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-4">
+                    <a href="{% url 'dashboard' %}" class="px-5 py-3 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
+                        Cancel
+                    </a>
+                    <button type="submit" class="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-brand-800 via-brand-700 to-emerald-600 hover:from-brand-900 hover:to-brand-800 shadow-md shadow-brand-700/25 hover:shadow-glow-emerald transition-all transform hover:-translate-y-0.5">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-lime-300"></i>
+                        <span>Calculate My Profit & Subsidies</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
                 </div>
             </form>
+        </div>
 
-            <div class="mt-6 text-center">
-                <a href="{% url 'dashboard' %}" class="text-xs font-semibold text-slate-400 hover:text-slate-600 transition">
-                    Cancel and return to Dashboard
-                </a>
+        <!-- Right Column: Live Interactive Simulation Studio (Inspired by FluxPay & Quantro) -->
+        <div class="lg:col-span-5 space-y-5 lg:sticky lg:top-24">
+            
+            <div class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-7 shadow-sm space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 block">Instant Simulation</span>
+                        <h3 class="text-base font-extrabold text-slate-900">Live Profit & Break-Even Check</h3>
+                    </div>
+                    <span class="inline-flex items-center gap-1 text-[11px] font-bold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span> Instant
+                    </span>
+                </div>
+
+                <!-- Dynamic KPI Tiles -->
+                <div class="grid grid-cols-2 gap-3.5">
+                    <!-- Break-Even Tile -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Break-Even Sales</span>
+                        <div id="sim-breakeven" class="text-xl font-extrabold text-slate-900 tabular-nums">₹33,333</div>
+                        <span class="text-[10px] text-slate-500 mt-1 block">Must sell this to avoid loss</span>
+                    </div>
+
+                    <!-- Net Profit Tile -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Take-Home Profit</span>
+                        <div id="sim-profit" class="text-xl font-extrabold text-emerald-600 tabular-nums">₹14,250</div>
+                        <span id="sim-margin" class="text-[10px] text-slate-500 mt-1 block">Margin: 21.9%</span>
+                    </div>
+
+                    <!-- Monthly EMI Tile -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Monthly Bank EMI</span>
+                        <div id="sim-emi" class="text-xl font-extrabold text-slate-900 tabular-nums">₹0</div>
+                        <span id="sim-debt-status" class="text-[10px] text-slate-500 mt-1 block">Self-Financed</span>
+                    </div>
+
+                    <!-- Debt Service Ratio Tile -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Loan Safety</span>
+                        <div id="sim-emi-ratio" class="text-xl font-extrabold text-slate-900 tabular-nums">0.0%</div>
+                        <span id="sim-debt-health" class="text-[10px] text-emerald-600 font-semibold mt-1 block">Safe Profile</span>
+                    </div>
+                </div>
+
+                <!-- Viability Progress Bar -->
+                <div>
+                    <div class="flex items-center justify-between text-xs mb-2">
+                        <span class="font-bold text-slate-700">Business Health Status:</span>
+                        <span id="sim-badge" class="font-extrabold text-emerald-700 px-2 py-0.5 rounded bg-emerald-50">
+                            Bank Ready
+                        </span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div id="sim-bar" class="h-full bg-gradient-to-r from-emerald-500 to-lime-500 transition-all duration-300" style="width: 75%;"></div>
+                    </div>
+                </div>
+
+                <!-- Explanation Note -->
+                <p id="sim-desc" class="text-xs text-slate-500 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                    Projected monthly turnover comfortably covers fixed rent and variable operational costs, with capacity to service debt.
+                </p>
             </div>
-
         </div>
-    </main>
+    </div>
+</div>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-6">
-        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
-            <p>GramVikas AI Advisory Platform &bull; Built with Django & LangGraph</p>
+<!-- High-Tech User-Friendly Loading Overlay (Inspired by Galilee Image 11 & FluxPay Image 1) -->
+<div id="loading-overlay" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-md w-full text-center text-white shadow-2xl relative overflow-hidden">
+        <div class="absolute -top-12 -left-12 w-48 h-48 bg-brand-500/20 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-tr from-brand-700 to-lime-400 flex items-center justify-center text-3xl shadow-glow-emerald">
+            🌾
         </div>
-    </footer>
+        <h3 class="text-xl font-extrabold tracking-tight mb-2">Preparing Your Business Report...</h3>
+        <p class="text-xs text-slate-400 mb-6">Analyzing your monthly profit, break-even targets, village customer demand, and matching government subsidies...</p>
+        
+        <div class="space-y-3 text-left text-xs text-slate-300 mb-6">
+            <div class="flex items-center gap-2.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>Calculating break-even sales and monthly take-home profit...</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+                <span class="w-2 h-2 rounded-full bg-lime-400"></span>
+                <span>Evaluating village demand and best haat sales channels...</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span>Matching 25%–35% government subsidies (PMEGP, MUDRA, KCC)...</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+                <span class="w-2 h-2 rounded-full bg-brand-400"></span>
+                <span>Formulating practical risk safeguards and bank-ready dossier...</span>
+            </div>
+        </div>
 
-</body>
-</html>
+        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-brand-500 via-lime-400 to-emerald-400 animate-pulse" style="width: 100%;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function syncSliderToInput(val) {
+        document.getElementById('id_variable_cost_ratio').value = val;
+        document.getElementById('slider-ratio-label').innerText = Math.round(val * 100) + '% (' + parseFloat(val).toFixed(2) + ')';
+        simulateRealtime();
+    }
+
+    function syncInputToSlider(val) {
+        const num = parseFloat(val);
+        if (!isNaN(num) && num >= 0 && num < 1) {
+            document.getElementById('ratio-slider').value = num;
+            document.getElementById('slider-ratio-label').innerText = Math.round(num * 100) + '% (' + num.toFixed(2) + ')';
+            simulateRealtime();
+        }
+    }
+
+    function simulateRealtime() {
+        const rev = parseFloat(document.getElementById('id_monthly_revenue').value) || 0;
+        const fixed = parseFloat(document.getElementById('id_monthly_fixed_costs').value) || 0;
+        const ratio = parseFloat(document.getElementById('id_variable_cost_ratio').value) || 0;
+        const loan = parseFloat(document.getElementById('id_loan_amount').value) || 0;
+        const rate = parseFloat(document.getElementById('id_annual_interest_rate').value) || 0;
+        const tenure = parseInt(document.getElementById('id_loan_tenure_months').value) || 12;
+
+        // Break-even
+        const margin = 1 - ratio;
+        const breakEven = margin > 0 ? (fixed / margin) : 0;
+        document.getElementById('sim-breakeven').innerText = '₹' + Math.round(breakEven).toLocaleString('en-IN');
+
+        // Profit
+        const profit = rev - (fixed + rev * ratio);
+        const profitEl = document.getElementById('sim-profit');
+        profitEl.innerText = '₹' + Math.round(profit).toLocaleString('en-IN');
+        if (profit >= 0) {
+            profitEl.className = 'text-xl font-extrabold text-emerald-600 tabular-nums';
+        } else {
+            profitEl.className = 'text-xl font-extrabold text-red-600 tabular-nums';
+        }
+
+        const profitMargin = rev > 0 ? ((profit / rev) * 100).toFixed(1) : '0.0';
+        document.getElementById('sim-margin').innerText = 'Margin: ' + profitMargin + '%';
+
+        // Loan EMI: P * r * (1+r)^n / ((1+r)^n - 1)
+        let emi = 0;
+        if (loan > 0 && rate > 0 && tenure > 0) {
+            const monthlyRate = (rate / 100) / 12;
+            const factor = Math.pow(1 + monthlyRate, tenure);
+            emi = (loan * monthlyRate * factor) / (factor - 1);
+            document.getElementById('sim-emi').innerText = '₹' + Math.round(emi).toLocaleString('en-IN');
+            document.getElementById('sim-debt-status').innerText = 'Tenure: ' + tenure + ' mo @ ' + rate + '%';
+        } else {
+            document.getElementById('sim-emi').innerText = '₹0';
+            document.getElementById('sim-debt-status').innerText = 'Self-Financed';
+        }
+
+        // EMI Ratio
+        let emiRatio = 0;
+        if (emi > 0 && rev > 0) {
+            emiRatio = (emi / rev) * 100;
+            document.getElementById('sim-emi-ratio').innerText = emiRatio.toFixed(1) + '%';
+        } else {
+            document.getElementById('sim-emi-ratio').innerText = '0.0%';
+        }
+
+        const debtHealthEl = document.getElementById('sim-debt-health');
+        if (emiRatio === 0) {
+            debtHealthEl.innerText = 'Debt-Free';
+            debtHealthEl.className = 'text-[10px] text-emerald-600 font-semibold mt-1 block';
+        } else if (emiRatio <= 25) {
+            debtHealthEl.innerText = 'Safe (<25%)';
+            debtHealthEl.className = 'text-[10px] text-emerald-600 font-semibold mt-1 block';
+        } else if (emiRatio <= 40) {
+            debtHealthEl.innerText = 'Moderate (25-40%)';
+            debtHealthEl.className = 'text-[10px] text-amber-600 font-semibold mt-1 block';
+        } else {
+            debtHealthEl.innerText = 'High Risk (>40%)';
+            debtHealthEl.className = 'text-[10px] text-red-600 font-semibold mt-1 block';
+        }
+
+        // Viability
+        const bar = document.getElementById('sim-bar');
+        const badge = document.getElementById('sim-badge');
+        const desc = document.getElementById('sim-desc');
+
+        if (profit > 10000 && (emiRatio <= 25)) {
+            bar.style.width = '88%';
+            bar.className = 'h-full bg-gradient-to-r from-emerald-500 to-lime-500 transition-all duration-300';
+            badge.innerText = 'Bankable';
+            badge.className = 'font-extrabold text-emerald-700 px-2 py-0.5 rounded bg-emerald-50 text-xs';
+            desc.innerText = 'Strong surplus capacity with low repayment stress. Meets credit guidelines for MUDRA or PMEGP loan sanctioning.';
+        } else if (profit >= 0) {
+            bar.style.width = '60%';
+            bar.className = 'h-full bg-gradient-to-r from-emerald-500 to-amber-500 transition-all duration-300';
+            badge.innerText = 'Viable / Caution';
+            badge.className = 'font-extrabold text-amber-700 px-2 py-0.5 rounded bg-amber-50 text-xs';
+            desc.innerText = 'Positive operating cash flow, but debt payments will consume a noticeable share of gross profit. Maintain safety buffer.';
+        } else {
+            bar.style.width = '25%';
+            bar.className = 'h-full bg-gradient-to-r from-amber-500 to-red-500 transition-all duration-300';
+            badge.innerText = 'Negative Cash Flow';
+            badge.className = 'font-extrabold text-red-700 px-2 py-0.5 rounded bg-red-50 text-xs';
+            desc.innerText = 'Operating deficit. Sales fail to cover fixed costs. Revisit variable pricing or reduce initial loan burden.';
+        }
+    }
+
+    function showLoadingOverlay() {
+        document.getElementById('loading-overlay').classList.remove('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const initialRatio = document.getElementById('id_variable_cost_ratio').value;
+        syncSliderToInput(initialRatio);
+    });
+</script>
+{% endblock %}
