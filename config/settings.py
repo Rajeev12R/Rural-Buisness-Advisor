@@ -26,12 +26,20 @@ GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-z7*^s3gh*oq-wcg9r%8d=nrse1vy294++imx#ul1m-!d$qqw+)'
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-z7*^s3gh*oq-wcg9r%8d=nrse1vy294++imx#ul1m-!d$qqw+)")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 
 ALLOWED_HOSTS = ["*"]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.onrender.com",
+    "https://*.railway.app",
+    "https://*.pythonanywhere.com",
+    "http://127.0.0.1",
+    "http://localhost",
+]
 
 
 # Application definition
@@ -51,6 +59,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
